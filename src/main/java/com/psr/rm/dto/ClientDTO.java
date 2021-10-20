@@ -1,21 +1,16 @@
-package com.php.rm.dto;
+package com.psr.rm.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
-
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ProductDTO {
-    private Long id;
-
-    @NotNull
+public class ClientDTO {
     private String name;
 
-    private String description;
+    private String document;
 }

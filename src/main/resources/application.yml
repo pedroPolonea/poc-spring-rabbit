@@ -1,10 +1,40 @@
-server:
-    port: 9002
 spring:
-  application:
-    name: poc-rabbit-mq
   rabbitmq:
     host: localhost
     port: 5672
     username: guest
     password: guest
+  cloud:
+    stream:
+      function:
+        definition: productConsumer;clientEmailConsumer;clientSMSConsumer
+      bindings:
+        productConsumer-in-0:
+          group: queue
+          destination: product
+          consumer:
+            queueNameGroupOnly: true
+            exchangeType: topic
+        clientEmailConsumer-in-0:
+          group: email.queue
+          destination: client
+          consumer:
+            queueNameGroupOnly: true
+            exchangeType: fanout
+            autoBindDlq: true
+            dlqDeadLetterExchange: dlq
+        clientSMSConsumer-in-0:
+          group: sms.queue
+          destination: client
+          consumer:
+            queueNameGroupOnly: true
+            exchangeType: fanout
+            autoBindDlq: true
+            dlqDeadLetterExchange: dlq
+      rabbit:
+        bindings:
+          productConsumer-in-0:
+            consumer:
+              autoBindDlq: true
+              deadLetterQueueName: dlq
+
