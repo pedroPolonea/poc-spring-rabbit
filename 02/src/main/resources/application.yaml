@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: Poc-Rabbit
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+#    virtual-host:
+
+  cloud:
+    function:
+      definition: processMessage
+    stream:
+      bindings:
+        processMessage-in-0:
+          destination: exchangeName
+          group: queue
+          #binder: rabbit
+          consumer:
+            max-attempts: 3 # Numero maximo de tentativas antes da mensagem ir para DLQ
+            backOffInitialInterval: 5000 # Define o tempo (em ms) antes da primeira tentativa de retry (2s).
+            backOffMultiplier: 2.0 # Multiplica o tempo de espera a cada tentativa (2x a cada erro).
+            backOffMaxInterval: 30000 # Tempo maximo de espera entre tentativas (30s).
+            #defaultRetryable: true # Habilita ou desabilita o retry automatico.
+            enableRetry: true
+            retryQueueName: exchangeName.queue.retry
+            retryableExceptions:
+              "com.poc.rabbit.Poc_Rabbit.BusinessException": false  # Excecoes que devem ser reprocessadas
+      rabbit:
+        bindings:
+          processMessage-in-0:
+            consumer:
+#              exchangeType: direct  # Define o tipo da Exchange
+              autoBindDlq: true
+#              queueNameGroupOnly: true # Evita que o nome da fila seja alterado automaticamente
+              deadLetterQueueName: exchangeName.queue.dlq
+              retryQueueName: exchangeName.queue.retry
+              ttl: 10000
+#              deadLetterExchange: my.dlx # Exchange da DLQ
+#              republishToDlq: false  # Evita que o Spring use o Handler padrao
+#              enableDlq: true  # Envia automaticamente para a DLQ
+
+
+
